@@ -171,8 +171,10 @@ where
 		.into_rpc(),
 	)?;
 
+	let chain_name = chain_spec.name().to_string();
 	let genesis_hash = client.block_hash(0).ok().flatten().expect("Genesis block exists; qed");
-	io.merge(ChainSpec::new(genesis_hash, &chain_spec).into_rpc())?;
+	let properties = chain_spec.properties();
+	io.merge(ChainSpec::new(chain_name, genesis_hash, properties).into_rpc())?;
 
 	io.merge(
 		SyncState::new(chain_spec, client.clone(), shared_authority_set, shared_epoch_changes)?
