@@ -20,28 +20,25 @@
 
 use crate::chain_spec::api::ChainSpecApiServer;
 use jsonrpsee::core::RpcResult;
+use sc_chain_spec::Properties;
 
 /// An API for chain spec RPC calls.
 pub struct ChainSpec {
 	/// The name of the chain.
 	name: String,
-	/// Chain properities.
-	properties: String,
 	/// The hexadecimal encoded hash of the genesis block.
 	genesis_hash: String,
+	/// Chain properities.
+	properties: Properties,
 }
 
 impl ChainSpec {
 	/// Creates a new [`ChainSpec`].
 	pub fn new<Hash: AsRef<[u8]>>(
+		name: String,
 		genesis_hash: Hash,
-		spec: &Box<dyn sc_chain_spec::ChainSpec>,
+		properties: Properties,
 	) -> Self {
-		let name = spec.name().to_string();
-
-		let properties = spec.properties();
-		let properties = serde_json::to_string(&properties).unwrap();
-
 		let genesis_hash = format!("0x{}", hex::encode(genesis_hash));
 
 		Self { name, properties, genesis_hash }
@@ -49,15 +46,15 @@ impl ChainSpec {
 }
 
 impl ChainSpecApiServer for ChainSpec {
-	fn chainspec_unstable_properties(&self) -> RpcResult<String> {
-		Ok(self.properties.clone())
-	}
-
 	fn chainspec_unstable_chain_name(&self) -> RpcResult<String> {
 		Ok(self.name.clone())
 	}
 
 	fn chainspec_unstable_genesis_hash(&self) -> RpcResult<String> {
 		Ok(self.genesis_hash.clone())
+	}
+
+	fn chainspec_unstable_properties(&self) -> RpcResult<Properties> {
+		Ok(self.properties.clone())
 	}
 }

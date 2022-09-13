@@ -23,12 +23,13 @@
 //! Methods are prefixed by `ChainSpec`.
 
 use jsonrpsee::{core::RpcResult, proc_macros::rpc};
+use sc_chain_spec::Properties;
 
 #[rpc(client, server)]
 pub trait ChainSpecApi {
 	/// Get the specification of the chain.
 	#[method(name = "chainSpec_unstable_properties", blocking)]
-	fn chainspec_unstable_properties(&self) -> RpcResult<String>;
+	fn chainspec_unstable_properties(&self) -> RpcResult<Properties>;
 
 	/// Get the chain name.
 	#[method(name = "chainSpec_unstable_chainName", blocking)]
