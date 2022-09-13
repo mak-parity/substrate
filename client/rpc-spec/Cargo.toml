@@ -20,3 +20,4 @@ serde_json = "1.0.85"
 
 # Chain Spec internal structures.
 sc-chain-spec = { version = "4.0.0-dev", path = "../chain-spec" }
+hex = "0.4"

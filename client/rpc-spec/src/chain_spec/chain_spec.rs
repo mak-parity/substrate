@@ -23,22 +23,31 @@ use jsonrpsee::core::RpcResult;
 
 /// An API for chain spec RPC calls.
 pub struct ChainSpec {
-	spec: Box<dyn sc_chain_spec::ChainSpec>,
+	/// The name of the chain.
+	name: String,
+	/// Chain properities.
+	properties: String,
+	/// The hexadecimal encoded hash of the genesis block.
+	genesis_hash: String,
 }
 
 impl ChainSpec {
-	/// Create a new [`ChainSpec`].
-	pub fn new(spec: Box<dyn sc_chain_spec::ChainSpec>) -> Self {
-		Self { spec }
+	/// Creates a new [`ChainSpec`].
+	pub fn new<Hash: AsRef<[u8]>>(genesis_hash: Hash, spec: &Box<dyn sc_chain_spec::ChainSpec>) -> Self
+	{
+		let name = spec.name().to_string();
+
+		let properties = spec.properties();
+		let properties = serde_json::to_string(&properties).unwrap();
+
+		let genesis_hash = format!("0x{}", hex::encode(genesis_hash));
+
+		Self { name, properties, genesis_hash }
 	}
 }
 
 impl ChainSpecApiServer for ChainSpec {
 	fn chainspec_unstable_properties(&self) -> RpcResult<String> {
-		let properties = self.spec.properties();
-
-		// TODO: Propagate error.
-		let ret = serde_json::to_string(&properties).unwrap();
-		Ok(ret)
+		Ok(self.properties.clone())
 	}
 }
