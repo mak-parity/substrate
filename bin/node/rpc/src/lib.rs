@@ -128,8 +128,7 @@ where
 	use substrate_state_trie_migration_rpc::{StateMigration, StateMigrationApiServer};
 
 	use sc_rpc_spec::chain_spec::{ChainSpec, ChainSpecApiServer};
-	// TODO: This should be replaced by the new API.
-	// use sc_sync_state_rpc::{SyncState, SyncStateApiServer};
+	use sc_sync_state_rpc::{SyncState, SyncStateApiServer};
 
 	let mut io = RpcModule::new(());
 	let FullDeps { client, pool, select_chain, chain_spec, deny_unsafe, babe, grandpa } = deps;
@@ -172,15 +171,13 @@ where
 		.into_rpc(),
 	)?;
 
-	io.merge(
-		ChainSpec::new(chain_spec).into_rpc(),
-	)?;
+	let genesis_hash = client.block_hash(0).ok().flatten().expect("Genesis block exists; qed");
+	io.merge(ChainSpec::new(genesis_hash, &chain_spec).into_rpc())?;
 
-	// TODO: This should be replaced by the new API.
-	// io.merge(
-	// 	SyncState::new(chain_spec, client.clone(), shared_authority_set, shared_epoch_changes)?
-	// 		.into_rpc(),
-	// )?;
+	io.merge(
+		SyncState::new(chain_spec, client.clone(), shared_authority_set, shared_epoch_changes)?
+			.into_rpc(),
+	)?;
 
 	io.merge(StateMigration::new(client.clone(), backend, deny_unsafe).into_rpc())?;
 	io.merge(Dev::new(client, deny_unsafe).into_rpc())?;
