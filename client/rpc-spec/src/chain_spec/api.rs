@@ -29,4 +29,12 @@ pub trait ChainSpecApi {
 	/// Get the specification of the chain.
 	#[method(name = "chainSpec_unstable_properties", blocking)]
 	fn chainspec_unstable_properties(&self) -> RpcResult<String>;
+
+	/// Get the chain name.
+	#[method(name = "chainSpec_unstable_chainName", blocking)]
+	fn chainspec_unstable_chain_name(&self) -> RpcResult<String>;
+
+	/// Get the chain's genesis hash.
+	#[method(name = "chainSpec_unstable_genesisHash", blocking)]
+	fn chainspec_unstable_genesis_hash(&self) -> RpcResult<String>;
 }

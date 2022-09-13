@@ -33,8 +33,10 @@ pub struct ChainSpec {
 
 impl ChainSpec {
 	/// Creates a new [`ChainSpec`].
-	pub fn new<Hash: AsRef<[u8]>>(genesis_hash: Hash, spec: &Box<dyn sc_chain_spec::ChainSpec>) -> Self
-	{
+	pub fn new<Hash: AsRef<[u8]>>(
+		genesis_hash: Hash,
+		spec: &Box<dyn sc_chain_spec::ChainSpec>,
+	) -> Self {
 		let name = spec.name().to_string();
 
 		let properties = spec.properties();
@@ -49,5 +51,13 @@ impl ChainSpec {
 impl ChainSpecApiServer for ChainSpec {
 	fn chainspec_unstable_properties(&self) -> RpcResult<String> {
 		Ok(self.properties.clone())
+	}
+
+	fn chainspec_unstable_chain_name(&self) -> RpcResult<String> {
+		Ok(self.name.clone())
+	}
+
+	fn chainspec_unstable_genesis_hash(&self) -> RpcResult<String> {
+		Ok(self.genesis_hash.clone())
 	}
 }
