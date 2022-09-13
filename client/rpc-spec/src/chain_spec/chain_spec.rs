@@ -28,7 +28,7 @@ pub struct ChainSpec {
 	name: String,
 	/// The hexadecimal encoded hash of the genesis block.
 	genesis_hash: String,
-	/// Chain properities.
+	/// Chain properties.
 	properties: Properties,
 }
 
@@ -46,15 +46,15 @@ impl ChainSpec {
 }
 
 impl ChainSpecApiServer for ChainSpec {
-	fn chainspec_unstable_chain_name(&self) -> RpcResult<String> {
+	fn chain_spec_unstable_chain_name(&self) -> RpcResult<String> {
 		Ok(self.name.clone())
 	}
 
-	fn chainspec_unstable_genesis_hash(&self) -> RpcResult<String> {
+	fn chain_spec_unstable_genesis_hash(&self) -> RpcResult<String> {
 		Ok(self.genesis_hash.clone())
 	}
 
-	fn chainspec_unstable_properties(&self) -> RpcResult<Properties> {
+	fn chain_spec_unstable_properties(&self) -> RpcResult<Properties> {
 		Ok(self.properties.clone())
 	}
 }

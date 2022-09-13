@@ -16,18 +16,23 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-//! This API exposes the specification of the substrate's chain.
+//! Substrate chain specification API.
+//!
+//! The *chain spec* (short for *chain specification*) allows inspecting the content of
+//! the specification of the chain that a JSON-RPC server is targeting.
+//!
+//! The values returned by the API are guaranteed to never change during the lifetime of the
+//! JSON-RPC server.
 //!
 //! # Note
 //!
-//! Methods are prefixed by `ChainSpec`.
+//! Methods are prefixed by `chainSpec`.
 
 #[cfg(test)]
 mod tests;
 
 pub mod api;
 pub mod chain_spec;
-pub mod error;
 
 pub use api::ChainSpecApiServer;
 pub use chain_spec::ChainSpec;

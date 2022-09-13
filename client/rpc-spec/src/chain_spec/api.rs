@@ -16,26 +16,38 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-//! This API exposes the specification of the substrate's chain.
-//!
-//! # Note
-//!
-//! Methods are prefixed by `ChainSpec`.
+//! API trait of the chain spec.
 
 use jsonrpsee::{core::RpcResult, proc_macros::rpc};
 use sc_chain_spec::Properties;
 
 #[rpc(client, server)]
 pub trait ChainSpecApi {
-	/// Get the chain name.
+	/// Get the chain name, as present in the chain specification.
+	///
+	/// # Unstable
+	///
+	/// This method is unstable and subject to change in the future.
 	#[method(name = "chainSpec_unstable_chainName", blocking)]
-	fn chainspec_unstable_chain_name(&self) -> RpcResult<String>;
+	fn chain_spec_unstable_chain_name(&self) -> RpcResult<String>;
 
 	/// Get the chain's genesis hash.
+	///
+	/// # Unstable
+	///
+	/// This method is unstable and subject to change in the future.
 	#[method(name = "chainSpec_unstable_genesisHash", blocking)]
-	fn chainspec_unstable_genesis_hash(&self) -> RpcResult<String>;
+	fn chain_spec_unstable_genesis_hash(&self) -> RpcResult<String>;
 
-	/// Get the specification of the chain.
+	/// Get the properties of the chain, as present in the chain specification.
+	///
+	/// # Note
+	///
+	/// The json whitespaces are not guaranteed to persist.
+	///
+	/// # Unstable
+	///
+	/// This method is unstable and subject to change in the future.
 	#[method(name = "chainSpec_unstable_properties", blocking)]
-	fn chainspec_unstable_properties(&self) -> RpcResult<Properties>;
+	fn chain_spec_unstable_properties(&self) -> RpcResult<Properties>;
 }

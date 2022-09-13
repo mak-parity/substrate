@@ -16,13 +16,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-//! Substrate RPC interfaces.
+//! JSON-RPC interface exposed by blockchain nodes in the Substrate ecosystem.
 //!
-//! A collection of RPC methods and subscriptions supported by all substrate clients.
+//! Specification document: https://paritytech.github.io/json-rpc-interface-spec/.
 
 #![warn(missing_docs)]
-
-mod policy;
-pub use policy::DenyUnsafe;
+#![deny(unused_crate_dependencies)]
 
 pub mod chain_spec;
