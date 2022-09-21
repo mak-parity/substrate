@@ -203,11 +203,17 @@ pub mod pallet {
 
 		// The other stuff.
 		/// Information concerning the different referendum tracks.
-		type Tracks: TracksInfo<
-			BalanceOf<Self, I>,
-			Self::BlockNumber,
-			RuntimeOrigin = <Self::RuntimeOrigin as OriginTrait>::PalletsOrigin,
-		>;
+		#[pallet::constant]
+		type Tracks: Get<
+				Vec<(
+					<Self::Tracks as TracksInfo<BalanceOf<Self, I>, Self::BlockNumber>>::Id,
+					TrackInfo<BalanceOf<Self, I>, Self::BlockNumber>,
+				)>,
+			> + TracksInfo<
+				BalanceOf<Self, I>,
+				Self::BlockNumber,
+				Origin = <Self::Origin as OriginTrait>::PalletsOrigin,
+			>;
 
 		/// The preimage provider.
 		type Preimages: QueryPreimage + StorePreimage;

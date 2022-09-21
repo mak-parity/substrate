@@ -35,7 +35,9 @@ const SEED: u32 = 0;
 
 fn funded_account<T: Config>(name: &'static str, index: u32) -> T::AccountId {
 	let caller: T::AccountId = account(name, index, SEED);
-	T::Currency::make_free_balance_be(&caller, BalanceOf::<T>::max_value());
+	// Give the account half of the maximum value of the `Balance` type.
+	// Otherwise some transfers will fail with an overflow error.
+	T::Currency::make_free_balance_be(&caller, BalanceOf::<T>::max_value() / 2u32.into());
 	caller
 }
 

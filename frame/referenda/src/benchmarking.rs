@@ -23,6 +23,7 @@ use assert_matches::assert_matches;
 use frame_benchmarking::{account, benchmarks_instance_pallet, whitelist_account};
 use frame_support::{
 	assert_ok,
+	dispatch::UnfilteredDispatchable,
 	traits::{Bounded, Currency, EnsureOrigin},
 };
 use frame_system::RawOrigin;
@@ -48,8 +49,6 @@ fn dummy_call<T: Config<I>, I: 'static>() -> Bounded<<T as Config<I>>::RuntimeCa
 }
 
 fn create_referendum<T: Config<I>, I: 'static>() -> (T::RuntimeOrigin, ReferendumIndex) {
-	use frame_support::dispatch::UnfilteredDispatchable;
-
 	let origin: T::RuntimeOrigin = T::SubmitOrigin::successful_origin();
 	if let Ok(caller) = frame_system::ensure_signed(origin.clone()) {
 		T::Currency::make_free_balance_be(&caller, BalanceOf::<T, I>::max_value());
@@ -235,7 +234,6 @@ benchmarks_instance_pallet! {
 		assert!(TrackQueue::<T, I>::get(&track).into_iter().all(|(i, _)| i != index));
 	}: place_decision_deposit<T::RuntimeOrigin>(origin, index)
 	verify {
-		let track = Referenda::<T, I>::ensure_ongoing(index).unwrap().track;
 		assert_eq!(TrackQueue::<T, I>::get(&track).len() as u32, T::MaxQueued::get());
 		assert!(TrackQueue::<T, I>::get(&track).into_iter().all(|(i, _)| i != index));
 	}
