@@ -112,10 +112,19 @@ fn info<T: Config<I>, I: 'static>(index: ReferendumIndex) -> &'static TrackInfoO
 }
 
 fn make_passing_after<T: Config<I>, I: 'static>(index: ReferendumIndex, period_portion: Perbill) {
-	let support = info::<T, I>(index).min_support.threshold(period_portion);
-	let approval = info::<T, I>(index).min_approval.threshold(period_portion);
+	// We add an extra 1 percent to handle any perbill rounding errors which may cause
+	// a proposal to not actually pass.
+	let support = info::<T, I>(index)
+		.min_support
+		.threshold(period_portion)
+		.saturating_add(Perbill::from_percent(1));
+	let approval = info::<T, I>(index)
+		.min_approval
+		.threshold(period_portion)
+		.saturating_add(Perbill::from_percent(1));
 	Referenda::<T, I>::access_poll(index, |status| {
 		if let PollStatus::Ongoing(tally, class) = status {
+			T::Tally::setup(class, Perbill::from_rational(1u32, 1000u32));
 			*tally = T::Tally::from_requirements(support, approval, class);
 		}
 	});
@@ -124,6 +133,7 @@ fn make_passing_after<T: Config<I>, I: 'static>(index: ReferendumIndex, period_p
 fn make_passing<T: Config<I>, I: 'static>(index: ReferendumIndex) {
 	Referenda::<T, I>::access_poll(index, |status| {
 		if let PollStatus::Ongoing(tally, class) = status {
+			T::Tally::setup(class, Perbill::from_rational(1u32, 1000u32));
 			*tally = T::Tally::unanimity(class);
 		}
 	});
@@ -132,6 +142,7 @@ fn make_passing<T: Config<I>, I: 'static>(index: ReferendumIndex) {
 fn make_failing<T: Config<I>, I: 'static>(index: ReferendumIndex) {
 	Referenda::<T, I>::access_poll(index, |status| {
 		if let PollStatus::Ongoing(tally, class) = status {
+			T::Tally::setup(class, Perbill::from_rational(1u32, 1000u32));
 			*tally = T::Tally::rejection(class);
 		}
 	});
@@ -213,7 +224,7 @@ benchmarks_instance_pallet! {
 	verify {
 		let track = Referenda::<T, I>::ensure_ongoing(index).unwrap().track;
 		assert_eq!(TrackQueue::<T, I>::get(&track).len() as u32, T::MaxQueued::get());
-		assert_eq!(TrackQueue::<T, I>::get(&track)[0], (index, 0u32.into()));
+		assert!(TrackQueue::<T, I>::get(&track).contains(&(index, 0u32.into())));
 	}
 
 	place_decision_deposit_not_queued {
@@ -315,11 +326,11 @@ benchmarks_instance_pallet! {
 	verify {
 		assert_eq!(DecidingCount::<T, I>::get(&track), deciding_count);
 		assert_eq!(TrackQueue::<T, I>::get(&track).len() as u32, T::MaxQueued::get() - 1);
-		assert!(queued.into_iter().skip(1).all(|i| Referenda::<T, I>::ensure_ongoing(i)
+		assert!(queued.into_iter().skip(1).filter(|i| Referenda::<T, I>::ensure_ongoing(*i)
 			.unwrap()
 			.deciding
-			.map_or(true, |d| d.confirming.is_some())
-		));
+			.map_or(false, |d| d.confirming.is_some())
+		).count() == 1);
 	}
 
 	nudge_referendum_requeued_insertion {
