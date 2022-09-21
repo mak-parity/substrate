@@ -212,7 +212,7 @@ pub mod pallet {
 			> + TracksInfo<
 				BalanceOf<Self, I>,
 				Self::BlockNumber,
-				Origin = <Self::Origin as OriginTrait>::PalletsOrigin,
+				RuntimeOrigin = <Self::RuntimeOrigin as OriginTrait>::PalletsOrigin,
 			>;
 
 		/// The preimage provider.
