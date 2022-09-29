@@ -11,6 +11,12 @@ use sc_telemetry::{Telemetry, TelemetryWorker};
 use sp_consensus_aura::sr25519::AuthorityPair as AuraPair;
 use std::{sync::Arc, time::Duration};
 
+// For offchain storage
+use sc_client_api::Backend;
+use sp_core::offchain::OffchainStorage;
+use sp_api::offchain::STORAGE_PREFIX;
+use sp_runtime::codec::{Decode, Encode};
+
 // Our native executor instance.
 pub struct ExecutorDispatch;
 
@@ -239,7 +245,7 @@ pub fn new_full(mut config: Configuration) -> Result<TaskManager, ServiceError> 
 		task_manager: &mut task_manager,
 		transaction_pool: transaction_pool.clone(),
 		rpc_builder: rpc_extensions_builder,
-		backend,
+		backend: backend.clone(),
 		system_rpc_tx,
 		config,
 		telemetry: telemetry.as_mut(),
@@ -338,6 +344,16 @@ pub fn new_full(mut config: Configuration) -> Result<TaskManager, ServiceError> 
 			sc_finality_grandpa::run_grandpa_voter(grandpa_config)?,
 		);
 	}
+
+	let mut offchain = backend.offchain_storage().expect("Offchain storage should be available");
+	offchain.set(
+		// Storage prefix for offchain worker
+		STORAGE_PREFIX,
+		// key
+		&"mykey".encode(),
+		// val
+		&"myval".encode()
+	);
 
 	network_starter.start_network();
 	Ok(task_manager)
